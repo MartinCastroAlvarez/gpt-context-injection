@@ -1,9 +1,8 @@
+import os
 import json
 from typing import Optional, List, Union
 import numpy as np
 import spacy
-
-english = spacy.load("en_core_web_md")
 
 
 class NumpyArrayEncoder(json.JSONEncoder):
@@ -22,6 +21,9 @@ class Vector:
     Vector class.
     """
 
+    PATH: str = os.path.join(os.sep, 'tmp', 'en_benji_custom')
+    DEFAULT: str = 'en_core_web_md'
+
     def __init__(self):
         """
         Lazy constructor.
@@ -29,13 +31,36 @@ class Vector:
         self._word: str = ''
         self._array: Optional[np.array] = None
 
+    @classmethod
+    @property
+    def model(cls) -> 'spacy.lang.en.English':
+        """
+        Loads the SpaCy model from disk.
+        """
+        if not hasattr(cls, '_model'):
+            try: 
+                cls._model: 'spacy.lang.en.English' = spacy.load(cls.PATH)
+            except IOError:
+                cls._model = spacy.load(cls.DEFAULT)
+        return cls._model
+
+    @classmethod
+    @property
+    def size(cls) -> int:
+        """
+        Returns the size of a vector.
+        """
+        vector: Vector = Vector()
+        vector.word = 'dummy'
+        return len(vector.array)
+
     @property
     def array(self) -> np.array:
         """
         Numpy vector getter.
         """
         if self._array is None and self.word:
-            self.array = english(self.word).vector
+            self._array = self.model(self.word).vector
         return self._array
 
     @array.setter
@@ -67,7 +92,7 @@ class Vector:
         """
         Evaluates if a word is a stop-word.
         """
-        return not self.word or english.vocab[self.word].is_stop
+        return not self.word or self.model.vocab[self.word].is_stop
 
     def to_json(self) -> List[float]:
         """
@@ -102,6 +127,22 @@ class Vector:
             if not vector.is_stop():
                 print('Vector:', vector.word)
                 vectors.append(vector)
+        return vectors
+
+    @classmethod
+    def train(cls, terms: Union[str, List[str]]) -> List['Vector']:
+        """
+        Trains SpaCy with new words.
+        https://spacy.io/api/vocab#set_vector
+        """
+        vectors: List['Vector'] = cls.to_vectors(terms)
+        for vector in vectors:
+            if not vector.is_known():
+                vector.array = np.random.rand(1, cls.size)
+                vector.array[0] = 100  # All unknowns together.
+                cls.model.vocab.set_vector(vector.word, vector.array)
+                assert vector.is_known()
+        Vector.model.to_disk(Vector.PATH)
         return vectors
 
     def to_list(self) -> List[float]:
