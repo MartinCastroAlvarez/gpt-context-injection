@@ -69,14 +69,12 @@ class Cluster:
         """
         Initializes the Elasticsearch index.
         """
-        vector: Vector = Vector()
-        vector.word = 'dummy'
         mapping: dict = {
             "mappings": {
                 "properties": {
                     "vector": {
                         "type": "dense_vector",
-                        "dims": len(vector.array),
+                        "dims": Vector.size,
                         "index": True,
                         "similarity": "cosine",
                     },

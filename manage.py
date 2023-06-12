@@ -1,6 +1,5 @@
-import json
 import begin
-from itertools import chain
+from typing import List
 from app.cache import Cache
 from app.blog import Blog
 from app.gpt import Gpt
@@ -72,10 +71,10 @@ def vectorize(
         post: Post = Post.load(cache.load())
         print("Post:", post.date, post.title)
         print(post.paragraphs)
-        if not post.vectors:
-            post.vectors.extend(Vector.to_vectors(post.keywords))
-            post.vectors.extend(Vector.to_vectors(post.summary.split()))
-            post.vectors.extend(Vector.to_vectors(post.goal.split()))
+        if not post.vectors or True:
+            post.vectors.extend(Vector.train(post.keywords))
+            post.vectors.extend(Vector.train(post.summary.split()))
+            post.vectors.extend(Vector.train(post.goal.split()))
             post.save()
 
 
