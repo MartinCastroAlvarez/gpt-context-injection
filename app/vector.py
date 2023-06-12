@@ -138,12 +138,19 @@ class Vector:
         vectors: List['Vector'] = cls.to_vectors(terms)
         for vector in vectors:
             if not vector.is_known():
-                vector.array = np.random.rand(1, cls.size)
-                vector.array[0, 0] = 100  # All unknowns together.
+                vector.array = cls.generate_random_vector()
                 cls.model.vocab.set_vector(vector.word, vector.array)
-                assert vector.is_known()
         Vector.model.to_disk(Vector.PATH)
         return vectors
+
+    @classmethod
+    def generate_random_vector(cls) -> np.array:
+        """
+        Generates a random vector for a new word.
+        """
+        array: np.array = np.random.rand(cls.size, )
+        array[0] = 3.14  # All unknowns together.
+        return array
 
     def to_list(self) -> List[float]:
         """
@@ -159,4 +166,4 @@ class Vector:
         """
         Determines if the vectorized word is known.
         """
-        return self.array.any()
+        return self.word and not isinstance(self.array, str) and self.array.any() and self.word in self.model.vocab

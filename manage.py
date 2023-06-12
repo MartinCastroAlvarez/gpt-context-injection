@@ -71,7 +71,7 @@ def vectorize(
         post: Post = Post.load(cache.load())
         print("Post:", post.date, post.title)
         print(post.paragraphs)
-        if not post.vectors or True:
+        if not post.vectors:
             post.vectors.extend(Vector.train(post.keywords))
             post.vectors.extend(Vector.train(post.summary.split()))
             post.vectors.extend(Vector.train(post.goal.split()))
