@@ -1,0 +1,5 @@
+.env
+*.sh
+index.sh
+*swp
+__pycache__/
