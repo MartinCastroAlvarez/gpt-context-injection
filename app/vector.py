@@ -139,7 +139,7 @@ class Vector:
         for vector in vectors:
             if not vector.is_known():
                 vector.array = np.random.rand(1, cls.size)
-                vector.array[0] = 100  # All unknowns together.
+                vector.array[0, 0] = 100  # All unknowns together.
                 cls.model.vocab.set_vector(vector.word, vector.array)
                 assert vector.is_known()
         Vector.model.to_disk(Vector.PATH)
