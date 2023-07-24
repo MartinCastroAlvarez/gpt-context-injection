@@ -1,5 +1,5 @@
 # GPT Context Injection
-Recommended system using GPT, Elasticsearch and context injection
+Recommender system using GPT, Elasticsearch and context injection
 
 ![wallpaper.jpg](wallpaper.jpg)
 
